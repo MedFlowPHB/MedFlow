@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <title>Projeto Web</title>
+    </h:head>
+    <h:body style="background-color: #000d16">
+        <h:form>
+            <p:growl id="growl" showDetail="true" />
+            <center>
+                <div style="display: flex; justify-content: center">
+                    <p:card id="card" style="width: 25rem; margin-bottom: 2em">
+                        <f:facet name="title">
+                            Login
+                        </f:facet>
+                        <div style="display: flex; flex-direction: column">
+                            <div style="display: flex; flex-direction: column; gap: 5px">
+                                <p:inputText id="nome" placeholder="Usuário" value="#{interfaceLogin.usuario.nome}" required="true"
+                                             requiredMessage="Campo Usuário obrigatório."/>
+                                <p:password id="senha" placeholder="Senha" value="#{interfaceLogin.usuario.senha}" required="true"
+                                            requiredMessage="Campo Senha obrigatório."/>
+                                <p:inputMask mask="(99)9 9999-9999" id="telefone" placeholder="Telefone" required="true"
+                                             value="#{interfaceLogin.usuario.telefone}" 
+                                             rendered="#{interfaceLogin.exibirFormulario}" requiredMessage="Campo Telefone obrigatório." />
+                            </div>
+
+                            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px">
+                                <p:commandButton value="Salvar" update="@form"  process="card"
+                                                 rendered="#{interfaceLogin.exibirFormulario}"
+                                                 actionListener="#{interfaceLogin.salvarUsuario()}" />
+
+                                <p:commandButton value="Entrar" update="card growl"
+                                                 rendered="#{!interfaceLogin.exibirFormulario}"
+                                                 action="#{interfaceLogin.login()}"/>
+
+                                <p:commandButton value="Cancelar" update="card growl" style="background-color: #ff2f29"
+                                                 rendered="#{interfaceLogin.exibirFormulario}" immediate="true"
+                                                 actionListener="#{interfaceLogin.setExibirFormulario(false)}" />
+
+                                <p:commandButton value="Cadastrar" update="card growl" process="@this"  
+                                                 rendered="#{!interfaceLogin.exibirFormulario}"  immediate="true"
+                                                 actionListener="#{interfaceLogin.setExibirFormulario(true)}"/>
+                            </div>
+                        </div>
+                    </p:card>
+                </div>
+            </center>
+        </h:form>
+    </h:body>
+</html>

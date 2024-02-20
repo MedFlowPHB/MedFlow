@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/XHtml.xhtml to edit this template
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Histórico</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="stylesheet" type="text/css" href="style.css" />
+    </h:head>
+    <h:body style="background-color: #000d16">
+        <f:metadata>
+        </f:metadata>
+        <h:form id="form">
+            <p:growl id="msgs" showDetail="true"/>
+            <div style="display: flex">
+                <p:toolbar style="width: 100%; background: rgba(255, 255, 255, 0.29);
+                           border-radius: 16px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(6.2px);
+                           -webkit-backdrop-filter: blur(6.2px); border: 0px">
+                    <div>
+                        <p:toolbarGroup>
+                            <p:commandButton style="border-radius: 50%" update="@form" action="#{interfaceHistorico.navegacao(1)}" icon="pi pi-home"
+                                             styleClass="ui-button-raised ui-button-secondary" />
+                        </p:toolbarGroup>
+
+                        <p:toolbarGroup align="center">
+                            <p:outputLabel style="color: #ffffff; font-size: 20px; font-weight: 600; padding-right: 123px" value="Controle FloraVida" />
+                        </p:toolbarGroup>
+                    </div>
+
+                    <p:toolbarGroup id="botoes2" align="right" style="gap: 10px">
+
+                    </p:toolbarGroup>
+                </p:toolbar>
+            </div>
+
+            <div style="margin-top: 15px; padding: 10px 10px 10px 10px; background-color: #F8F9FA; border-radius: 16px">
+                <p:dataTable style="border: 0px solid #fff" rowKey="#{venda.id}" widgetVar="producTable" id="productTable" value="#{interfaceHistorico.vendas}"
+                             var="venda" scrollable="true" scrollHeight="420">
+
+                    <f:facet name="header">
+                        <div style="display: flex; justify-content: space-between; padding: 0px 40px 0px 40px; align-items: center; " >
+                            <p:outputLabel value="Histórico de Dispensa" />
+                            <div class="container" style="display: flex; gap: 5px">
+                                <div>
+                                    <p:commandButton class="item" style="border-radius: 160px" id="toggler" process="@this :form:msgs" styleClass="ui-button-raised ui-button-secondary"
+                                                     update=":form:productTable :form:msgs" type="button" icon="pi pi-align-justify">
+                                        <p:columnToggler datasource=":form:productTable" id="colToggler" trigger="toggler">
+                                            <p:ajax process="@this :form:msgs" update=":form:productTable :form:msgs" event="toggle" listener="#{filtroHistorico.onToggle}"/>
+                                        </p:columnToggler>
+                                    </p:commandButton>
+                                </div>
+                                <div>
+                                    <p:commandButton class="item" style="border-radius: 50%; color: white" styleClass="ui-button-raised ui-button-success" icon="pi pi-file-pdf"
+                                                     process="@this :form:productTable" update=":form:msgs :form:productTable @this" rendered="#{filtroHistorico.gerarPDFcolSelecionadas}"
+                                                     actionListener="#{filtroHistorico.gerarPDFSelecionado()}" ajax="false">
+                                        <p:fileDownload value="#{filtroHistorico.file}"/>
+                                    </p:commandButton>
+                                    <p:commandButton class="item"  style="border-radius: 50%; color: white" styleClass="ui-button-success" icon="pi pi-file-pdf"
+                                                     process="@this :form:productTable" update=":form:msgs :form:productTable @this" rendered="#{!filtroHistorico.gerarPDFcolSelecionadas}"
+                                                     actionListener="#{filtroHistorico.gerarPDFSelecionado()}" ajax="false">
+                                        <p:fileDownload value="#{filtroHistorico.file}"/>
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </f:facet>
+
+                    <p:column filterBy="#{venda.paciente.nome}" filterMatchMode="contains" sortBy="#{venda.paciente.nome}" width="30%" 
+                              headerText="Paciente">
+                        <h:outputText value="#{venda.paciente.nome}"/>
+                    </p:column>
+
+                    <p:column filterBy="#{venda.paciente.sus}" filterMatchMode="contains" sortBy="#{venda.paciente.sus}" width="30%"
+                              headerText="SUS" style="text-align: center; vertical-align: middle;">
+                        <h:outputText value="#{venda.paciente.sus}"/>
+                    </p:column>                    
+
+                    <p:column sortBy="#{filtroGlobal.formatoCustomizado(venda.data)}"
+                              filterBy="#{filtroGlobal.formatoCustomizado(venda.data)}"
+                              filterMatchMode="contains"
+                              width="30%" headerText="Data" style="text-align: center; vertical-align: middle;">
+                        <h:outputText value="#{venda.data}">
+                            <f:convertDateTime pattern="#{filtroGlobal.dataPadrao()}" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column field="responsavel" width="15%" headerText="Responsável" style="text-align: center; vertical-align: middle;">
+                        <h:outputText value="#{venda.responsavel}"/>
+                    </p:column>
+
+                    <p:column exportable="false" toggleable="false" width="6%">
+                        <p:commandButton style="border-radius: 50%" icon="pi pi-search-plus" styleClass="ui-button-raised ui-button-success"
+                                         process="@this" actionListener="#{interfaceHistorico.pesquisarVenda(venda)}"
+                                         action="#{filtroHistorico.setVenda(venda)}"
+                                         oncomplete="PF('historico-dialog').show()" update=":form:historico-dialog" />
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+            <div>
+                <p:dialog style="border-radius: 16px" width="800px" id="historico-dialog" showEffect="fade" modal="true" widgetVar="historico-dialog"
+                          responsive="true" closable="false" resizable="false">
+                    <p:outputPanel id="historico-content" class="ui-fluid">
+                        <p:outputPanel>
+                            <p:dataTable id="dataTable-historico" value="#{interfaceHistorico.produtosVenda}" var="produto"
+                                         rowKey="#{produto.id}">
+                                <f:facet name="header">
+                                    <div style="display: flex; justify-content: space-around">
+                                        <div>
+                                            <p:outputLabel style="font-size:150%; color: red; text-decoration:none;">
+                                                <span class="ui-icon pi pi-user"></span>
+                                            </p:outputLabel>
+                                            <p:outputLabel value="#{interfaceHistorico.venda.paciente.nome}"/>
+                                        </div>
+                                        <div>
+                                            <p:outputLabel style="font-size:150%; color:red; text-decoration:none;">
+                                                <span class="ui-icon pi pi-calendar"></span>
+                                            </p:outputLabel>
+                                            <p:outputLabel value="#{interfaceHistorico.venda.data}" >
+                                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                            </p:outputLabel>
+                                        </div>
+                                    </div>
+                                </f:facet>
+                                <p:column width="30%" headerText="Medicamento">
+                                    <h:outputText value="#{produto.nome}"/>
+                                </p:column>
+
+                                <p:column width="20%" headerText="Lote">
+                                    <h:outputText value="#{produto.lote}"/>
+                                </p:column>
+
+                                <p:column width="15%" headerText="Quantidade">
+                                    <h:outputText value="#{produto.quantidade} UN"/>
+                                </p:column>
+
+                                <p:column width="15%" headerText="Validade">
+                                    <h:outputText value="#{produto.validade}" >
+                                        <f:convertDateTime pattern="#{filtroGlobal.dataPadrao()}"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:dataTable>
+                        </p:outputPanel>
+                    </p:outputPanel>
+                    <f:facet name="footer">
+                        <div style="display: flex; justify-content: center; justify-content: center">
+                            <p:commandButton value="Imprimir" style="width: 100px; border-radius: 16px; color: white"
+                                             icon="pi pi-file-pdf" styleClass="ui-button-raised ui-button-success"
+                                             process="@this :form:productTable" update=":form:msgs :form:productTable @this"
+                                             rendered="#{filtroHistorico.gerarPDFcolSelecionadas}"
+                                             actionListener="#{filtroHistorico.gerarPDF()}" ajax="false">
+                                <p:fileDownload value="#{filtroHistorico.file}"/>
+                            </p:commandButton>
+                            <p:commandButton value="Imprimir" style="width: 100px; border-radius: 16px; color: white"
+                                             icon="pi pi-file-pdf" styleClass="ui-button-raised ui-button-success"
+                                             process="@this :form:productTable" update=":form:msgs :form:productTable @this"
+                                             rendered="#{!filtroHistorico.gerarPDFcolSelecionadas}"
+                                             actionListener="#{filtroHistorico.gerarPDFSelecionado()}" ajax="false">
+                                <p:fileDownload value="#{filtroHistorico.file}"/>
+                            </p:commandButton>
+                            <p:commandButton style="width: 100px; border-radius: 16px" value="Voltar" process="@this"
+                                             actionListener="#{filtroHistorico.setVenda(venda)}" styleClass="ui-button-raised ui-button-secondary"
+                                             oncomplete="PF('historico-dialog').hide()"/>
+                        </div>
+                    </f:facet>
+                </p:dialog>
+            </div>
+        </h:form>
+    </h:body>
+</html>

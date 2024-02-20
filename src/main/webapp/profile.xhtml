@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/XHtml.xhtml to edit this template
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Perfil</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </h:head>
+    <h:body  style="background-color: #000d16">
+        <h:form id="form">
+            <p:growl id="msgs" showDetail="true"/>
+
+            <div id="toolbar" style="display: flex">
+                <p:toolbar style="width: 100%; display: flex; background: rgba(255, 255, 255, 0.29);
+                           border-radius: 16px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(6.2px);
+                           -webkit-backdrop-filter: blur(6.2px); border: 0px">
+                    <p:toolbarGroup style="gap: 10px">
+                        <p:commandButton style="border-radius: 50%" update="@form" action="#{interfacePerfil.navegacao(1)}" icon="pi pi-home"
+                                         styleClass="ui-button-raised ui-button-secondary" />
+                    </p:toolbarGroup>
+                    <p:toolbarGroup align="center">
+                        <p:outputLabel style="color: #ffffff; font-size: 20px; font-weight: 600; padding-right: 123px" value="Controle FloraVida" />
+                    </p:toolbarGroup>
+                    <p:toolbarGroup align="right" style="gap: 10px">
+
+                    </p:toolbarGroup>
+                </p:toolbar>
+            </div>
+
+            <div style="display: flex; padding: 15px; background-color: #ffffff; border-radius: 16px; margin-top: 10px">
+                <p:dataTable widgetVar="usuariosTable" rowKey="#{usuario.id}" id="usuarioTable" value="#{interfacePerfil.usuarios}"
+                             var="usuario" editable="true" paginator="true" rows="5" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks}
+                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                             rowsPerPageTemplate="5,10,{ShowAll|'Todos'}" lazy="false"
+                             reflow="true" rowSelectMode="add">
+
+                    <f:facet name="header">
+                        <div style="display: flex; justify-content: space-between; align-items: center" >
+                            <p:outputLabel value="Usuários" />
+                            <div style="display: flex; gap: 5px">
+                                <p:commandButton style="border-radius: 50%" oncomplete="PF('cadastrar-Usuario-dialog').show()"
+                                                 icon="pi pi-user-plus" styleClass="ui-button-raised ui-button-success" process="@this"
+                                                 update=":form:cadastrar-Usuario-dialog" actionListener="#{interfacePerfil.novoUsuario()}"
+                                                 action="#{interfacePerfil.setSalvareditar(true)}" immediate="true">
+                                    <p:ajax update=":form:cadastrar-Usuario-dialog" resetValues="true" />
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </f:facet>
+
+                    <p:column field="nome" visible="true" headerText="Nome" width="30%">
+                        <h:outputText value="#{usuario.nome}" />
+                    </p:column>
+
+                    <p:column field="email" visible="true" headerText="e-Mail" width="20%">
+                        <h:outputText value="#{usuario.email}" />
+                    </p:column>
+
+                    <p:column field="email" visible="true" headerText="e-Mail" width="20%">
+                        <h:outputText value="#{usuario.asct}" />
+                    </p:column>
+
+                    <p:column field="email" visible="true" headerText="e-Mail" width="20%">
+                        <h:outputText value="#{usuario.telefone}" />
+                    </p:column>
+
+                    <p:column exportable="false" toggleable="false" width="3%">
+                        <p:commandButton style="border-radius: 50%" id="editarUsuario"
+                                         actionListener="#{interfacePerfil.setUsuario(usuario)}"
+                                         action="#{interfacePerfil.setSalvareditar(false)}"
+                                         oncomplete="PF('cadastrar-Usuario-dialog').show()" styleClass="ui-button-raised ui-button-success"
+                                         update=":form:cadastrar-Usuario-dialog :form:msgs" icon="pi pi-user-edit" />
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+            <p:dialog id="deleteUsuarioDialog" style="border-radius: 25px" header="Excluir Usuário" showEffect="fade" modal="true"
+                      widgetVar="deleteUsuarioDialog" responsive="true">
+                <p:outputPanel id="delete-content" class="ui-fluid">
+                    <p:outputPanel>
+                        <div class="field">
+                            <p:outputLabel value="Deseja deletar esse usuário?" />
+                        </div>
+                    </p:outputPanel>
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <div style="display: flex; gap: 10px">
+                        <p:commandButton id="confirmaDelet" value="Excluir" process=":form:delete-content @this"
+                                         update=":form:delete-content :form:msgs :form:usuarioTable" icon="pi pi-check"
+                                         styleClass="ui-button-raised ui-button-danger"
+                                         actionListener="#{interfacePerfil.deletarUsuario()}"
+                                         oncomplete="PF('deleteUsuarioDialog').hide(); PF('cadastrar-Usuario-dialog').hide()"/>
+
+                        <p:commandButton style="size: 30px" id="cancelaDelet" value="Cancelar"
+                                         icon="pi pi-times" styleClass="ui-button-raised ui-button-secondary"
+                                         oncomplete="PF('deleteUsuarioDialog').hide()" update=":form:deleteUsuarioDialog"/>
+                    </div>
+                </f:facet>
+            </p:dialog>
+
+            <p:dialog id="cadastrar-Usuario-dialog" style="border-radius: 25px" header="Cadastrar Usuário" showEffect="fade" modal="true"
+                      widgetVar="cadastrar-Usuario-dialog" resizable="false" responsive="true">
+                <p:outputPanel id="Usuario-content" class="ui-fluid">
+                    <p:outputPanel>
+                        <div style="width: 310px" class="field">
+                            <p:outputLabel value="Usuário" />
+                            <p:inputText value="#{interfacePerfil.usuario.nome}" required="false"/>
+
+                            <p:outputLabel value="CPF"/>
+                            <p:inputMask value="#{interfacePerfil.usuario.cpf}" mask="999.999.999-99" required="false"/>
+
+                            <p:outputLabel value="Telefone" />
+                            <p:inputMask value="#{interfacePerfil.usuario.telefone}" mask="(99)9 9999-9999" required="false"/>
+
+                            <p:outputLabel value="Email: " />
+                            <p:inputText style="width: 100%" value="#{interfacePerfil.usuario.email}"/>
+
+                            <p:outputLabel value="Sexo"/>
+                            <p:selectOneMenu value="#{interfacePerfil.usuario.sexo}" >
+                                <f:selectItem itemLabel="Homem" itemValue="Homem" />
+                                <f:selectItem itemLabel="Mulher" itemValue="Mulher" />
+                                <f:selectItem itemLabel="Outro" itemValue="Outro" />
+                            </p:selectOneMenu>
+
+                            <p:outputLabel value="ASC: " />
+                            <p:inputText style="width: 100%" value="#{interfacePerfil.usuario.asct}"/>
+                        </div>
+                    </p:outputPanel>
+                </p:outputPanel>
+                <f:facet id="facet" name="footer">
+                    <div style="width: 100%; display: flex; justify-content: space-between">
+                        <div>
+                            <p:commandButton value="Salvar" id="btSalvar"  style="color: white; size: 30px" icon="pi pi-plus-circle"
+                                             styleClass="ui-button-raised ui-button-success" process="@this :form:Usuario-content :form:usuarioTable"
+                                             update="@this :form:msgs :form:Usuario-content :form:cadastrar-Usuario-dialog :form:usuarioTable" 
+                                             actionListener="#{interfacePerfil.salvarUsuario()}"
+                                             oncomplete="PF('cadastrar-Usuario-dialog').hide()" rendered="#{interfacePerfil.salvareditar}"/>
+
+                            <p:commandButton value="Editar" icon="pi pi-check" actionListener="#{interfacePerfil.editarUsuario()}"
+                                             styleClass="ui-button-raised ui-button-success"
+                                             update=":form:usuarioTable :form:cadastrar-Usuario-dialog :form:msgs @this" process=":form:usuarioTable :form:cadastrar-Usuario-dialog @this"
+                                             oncomplete="PF('cadastrar-Usuario-dialog').hide()" rendered="#{!interfacePerfil.salvareditar}" >
+                            </p:commandButton>
+                            <p:commandButton style="width: 50px" icon="pi pi-trash" styleClass="ui-button-raised ui-button-danger"
+                                             oncomplete="PF('deleteUsuarioDialog').show()" rendered="#{!interfacePerfil.salvareditar}">
+                            </p:commandButton>
+                            <p:commandButton value="Cancelar" style="color: white; size: 30px" icon="pi pi-times"
+                                             styleClass="ui-button-raised ui-button-secondary" process="@this"
+                                             oncomplete="PF('cadastrar-Usuario-dialog').hide()">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</html>

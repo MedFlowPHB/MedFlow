@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/XHtml.xhtml to edit this template
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Controle FloraVida</title>
+        <link rel="stylesheet" type="text/css" href="style.css" />
+    </h:head>
+    <h:body style="background-color: #000d16">
+        <h:form id="form">
+            <p:growl id="msgs" showDetail="true"/>
+            <div id="toolbar" style="display: flex">
+                <p:toolbar style="width: 100%; background: rgba(255, 255, 255, 0.29);
+                           border-radius: 16px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); -webkit-backdrop-filter: blur(6.2px); border: 0px">
+                    <p:toolbarGroup style="gap: 10px">
+                    </p:toolbarGroup>
+                    <p:toolbarGroup align="center">
+                        <p:outputLabel style="color: #ffffff; font-size: 20px; font-weight: 600; padding-right: 48px" value="Controle FloraVida" />
+                    </p:toolbarGroup>
+
+                    <p:toolbarGroup align="right">
+                        <p:menuButton icon="pi pi-users" style="border-radius: 50%" styleClass="ui-button-raised ui-button-success">
+                            <p:menuitem style="display: flex; justify-content: center; padding: 10px" value="Usuários" action="#{interfaceHomepage.navegacao(1)}"/>
+                            <p:menuitem style="display: flex; justify-content: center; padding: 10px" value="Pacientes" action="#{interfaceHomepage.navegacao(4)}"/>
+                            <p:menuitem style="display: flex; justify-content: center; padding: 10px" value="Microáreas" action="#{interfaceHomepage.navegacao(5)}"/>
+                        </p:menuButton>
+                    </p:toolbarGroup>
+                </p:toolbar>
+            </div>
+
+            <div id="dataTable" style="display: flex; margin-top: 15px; border-radius: 15px; gap: 15px">
+                <div style="width: 100%; padding: 10px 10px 10px 10px; border-radius: 16px; background-color: #F8F9FA">
+
+                    <p:dataTable rowKey="#{produto.id}" style="line-height: 1; padding: 0px" id="productTable" value="#{interfaceHomepage.produtos}"
+                                 var="produto" scrollable="true" scrollHeight="420">
+
+                        <f:facet name="header">
+                            <div style="display: flex; justify-content: space-between; align-items: center" >
+                                <p:outputLabel value="Estoque" />
+                                <div style="display: flex; gap: 5px">
+                                    <p:commandButton class="button" style="border-radius: 160px" id="toggler" process="@this :form:msgs"
+                                                     update=":form:productTable :form:msgs" type="button" icon="pi pi-align-justify"
+                                                     styleClass="ui-button-raised ui-button-secondary">
+                                        <p:columnToggler datasource=":form:productTable" id="colToggler" trigger="toggler">
+                                            <p:ajax process="@this :form:msgs" update=":form:productTable :form:msgs" event="toggle" listener="#{filtroEstoque.onToggle}"/>
+                                        </p:columnToggler>
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </f:facet>
+
+                        <p:column field="nome" visible="true" headerText="Nome" width="30%">
+                            <h:outputText value="#{produto.nome}" />
+                        </p:column>
+
+                        <p:column field="lote" visible="true" headerText="Lote" width="20%" style="text-align: center; vertical-align: middle;">
+                            <h:outputText value="#{produto.lote}" />
+                        </p:column>
+
+                        <p:column field="quantidade" visible="true" headerText="Quantidade" style="text-align: center; vertical-align: middle;">
+                            <h:outputText value="#{produto.quantidade}"/>
+                        </p:column>
+
+                        <p:column sortBy="#{filtroGlobal.formatoCustomizado(produto.validade)}"
+                                  filterBy="#{filtroGlobal.formatoCustomizado(produto.validade)}"
+                                  filterMatchMode="contains"
+                                  visible="true" headerText="Validade" style="text-align: center; vertical-align: middle;">
+                            <h:outputText style="color: #{interfaceHomepage.color(produto.validade)}" value="#{produto.validade}" >
+                                <f:convertDateTime pattern="#{filtroGlobal.dataPadrao()}"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <!--BOTÃO EDITAR-->
+                        <p:column exportable="false" toggleable="false" width="3%">
+                            <p:commandButton style="border-radius: 50%"
+                                             id="editarProduto" styleClass="ui-button-raised ui-button-success"
+                                             actionListener="#{interfaceHomepage.setProduto(produto)}"
+                                             action="#{interfaceHomepage.setSalvareditar(false)}"
+                                             oncomplete="PF('manageProductDialog').show()"
+                                             update=":form:manageProductDialog :form:msgs" icon="pi pi-pencil" />
+                        </p:column>
+                    </p:dataTable>
+                </div>
+
+                <p:card id="card" style="width: 300px; background: rgba(255, 255, 255, 0.29);
+                        border-radius: 16px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(6.2px);
+                        -webkit-backdrop-filter: blur(6.2px);">
+
+                    <div class="container" style="display: flex; flex-direction: column">
+                        <div style="width: 100%">
+                            <p:commandButton class="item" style="width: 100%; border-radius: 160px" value="Abrir Dispensa" update="@form"
+                                             icon="pi pi-folder-open" styleClass="ui-button-raised ui-button-success"
+                                             action="#{interfaceHomepage.navegacao(2)}" />
+                        </div>
+                        <div style="margin-top: 5px">
+                            <p:commandButton class="item" style="width: 100%; border-radius: 160px" value="Historico de Dispensa" icon="pi pi-replay"
+                                             styleClass="ui-button-raised ui-button-success" action="#{interfaceHomepage.navegacao(3)}" />
+                        </div>
+                        <div style="margin-top: 5px">
+                            <p:commandButton class="item" value="Novo Medicamento" style="width: 100%; border-radius: 160px" oncomplete="PF('manageProductDialog').show()"
+                                             icon="pi pi-plus-circle" styleClass="ui-button-raised ui-button-success"
+                                             actionListener="#{interfaceHomepage.novoProduto()}" 
+                                             action="#{interfaceHomepage.setSalvareditar(true)}"
+                                             update=":form:manageProductDialog">
+                                <p:ajax update=":form:manageProductDialog" resetValues="true" />
+                            </p:commandButton>
+                        </div>
+                        <div style="margin-top: 5px">
+                            <p:commandButton class="item" value="Gerar Relatório" style="width: 100%; border-radius: 160px; color: white" styleClass="ui-button-raised ui-button-success"
+                                             icon="pi pi-file-pdf"
+                                             process="@this :form:productTable" update=":form:msgs :form:productTable @this"
+                                             rendered="#{!filtroEstoque.gerarPDFcolSelecionadas}"
+                                             actionListener="#{filtroEstoque.gerarPDFSelecionado()}" ajax="false">
+                                <p:fileDownload value="#{filtroEstoque.file}" />
+                            </p:commandButton>
+                            <p:commandButton class="item" value="Gerar Relatório" style="width: 100%; border-radius: 160px; color: white" styleClass="ui-button-raised ui-button-success" 
+                                             icon="pi pi-file-pdf"
+                                             process="@this :form:productTable" update=":form:msgs :form:productTable @this"
+                                             rendered="#{filtroEstoque.gerarPDFcolSelecionadas}"
+                                             actionListener="#{filtroEstoque.gerarPDFSelecionado()}" ajax="false">
+                                <p:fileDownload value="#{filtroEstoque.file}" />
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </p:card>
+            </div>
+
+            <p:dialog id="deleteProductDialog" style="border-radius: 25px" header="Excluir Produto" showEffect="fade" modal="true"
+                      widgetVar="deleteProductDialog" responsive="true" onHide="#{interfaceHomepage.novoProduto()}">
+                <p:outputPanel id="delete-content" class="ui-fluid">
+                    <p:outputPanel>
+                        <div class="field">
+                            <p:outputLabel value="Deseja deletar esse produto?" />
+                        </div>
+                    </p:outputPanel>
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <div style="display: flex; gap: 10px">
+                        <p:commandButton id="confirmaDelet" value="Excluir" process="delete-content @this"
+                                         update="delete-content :form:msgs :form:productTable"
+                                         icon="pi pi-check" styleClass="ui-button-raised ui-button-danger" 
+                                         actionListener="#{interfaceHomepage.deletarProduto()}"
+                                         oncomplete="PF('deleteProductDialog').hide(); PF('manageProductDialog').hide()"/>
+                        <p:commandButton style="size: 30px" id="cancelaDelet" value="Cancelar" process="@this"
+                                         update="productTable" icon="pi pi-times" styleClass="ui-button-raised ui-button-secondary"
+                                         oncomplete="PF('deleteProductDialog').hide()"/>
+                    </div>
+                </f:facet>
+            </p:dialog>
+
+            <div>
+                <p:dialog id="manageProductDialog" style="border-radius: 25px" header="Cadastrar Novo Produto" showEffect="fade" modal="true"
+                          widgetVar="manageProductDialog" responsive="true">
+                    <p:outputPanel id="manage-product-content" class="ui-fluid">
+                        <p:outputPanel >
+                            <div class="field">
+                                <p:outputLabel for="name" value="Nome"/>
+                                <p:inputText id="name" value="#{interfaceHomepage.produto.nome}" required="false" />
+                            </div>
+
+                            <div class="field">
+                                <p:outputLabel for="description" value="Descrição" />
+                                <p:inputTextarea id="description" value="#{interfaceHomepage.produto.descricao}" required="false"  />
+                            </div>
+
+                            <div class="formgrid grid">
+                                <div class="field col">
+                                    <p:outputLabel for="lote" value="Lote" />
+                                    <p:inputText id="lote" value="#{interfaceHomepage.produto.lote}" required="false"/>
+                                </div>
+
+                                <div class="field col">
+                                    <p:outputLabel for="quantity" value="Quantidade"/>
+                                    <p:spinner id="quantity" value="#{interfaceHomepage.produto.quantidade}" min="0"  />
+                                </div>
+
+                                <div class="field col">
+                                    <p:outputLabel for="expiration" value="Validade"/>
+                                    <p:datePicker id="expiration" pattern="dd/MM/yyyy" value="#{interfaceHomepage.produto.validade}" />
+                                </div>
+                            </div>
+                        </p:outputPanel>
+                    </p:outputPanel>
+
+                    <f:facet name="footer">
+                        <div style="width: 100%; display: flex; justify-content: space-between">
+                            <div>
+                                <p:commandButton value="Salvar" icon="pi pi-check" actionListener="#{interfaceHomepage.salvarProduto()}"
+                                                 update=":form:productTable :form:msgs" oncomplete="PF'(manageProductDialogg')"
+                                                 process=":form:productTable manage-product-content @this"
+                                                 rendered="#{interfaceHomepage.salvareditar}"
+                                                 styleClass="ui-button-raised ui-button-success">
+                                </p:commandButton>
+                                <p:commandButton value="Editar" icon="pi pi-check" actionListener="#{interfaceHomepage.editarProduto()}"
+                                                 update=":form:productTable :form:manageProductDialog :form:msgs @this"
+                                                 process=":form:productTable manage-product-content @this"
+                                                 oncomplete="PF('manageProductDialog').hide()" rendered="#{!interfaceHomepage.salvareditar}"
+                                                 styleClass="ui-button-raised ui-button-success">
+                                </p:commandButton>
+
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
+                                                    class="ui-button-secondary" styleClass="ui-button-raised ui-button-secondary" type="button" />
+                               </div>
+                               <div>
+                                   <p:commandButton style="width: 50px" icon="pi pi-trash" styleClass="ui-button-raised ui-button-danger"
+                                                    oncomplete="PF('deleteProductDialog').show()" rendered="#{!interfaceHomepage.salvareditar}">
+                                   </p:commandButton>
+                               </div>
+                           </div>
+                       </f:facet>
+                </p:dialog>
+            </div>
+        </h:form>
+    </h:body>
+</html>

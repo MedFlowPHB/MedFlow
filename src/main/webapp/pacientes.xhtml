@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/XHtml.xhtml to edit this template
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Pacientes</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="stylesheet" type="text/css" href="style.css" />
+    </h:head>
+    <h:body  style="background-color: #000d16">
+        <h:form id="form">
+            <p:growl id="msgs" showDetail="true"/>
+
+            <div id="toolbar" style="display: flex">
+                <p:toolbar style="width: 100%; display: flex; background: rgba(255, 255, 255, 0.29);
+                           border-radius: 16px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(6.2px);
+                           -webkit-backdrop-filter: blur(6.2px); border: 0px">
+                    <p:toolbarGroup style="gap: 10px">
+                        <p:commandButton style="border-radius: 50%" update="@form" action="#{interfacePerfil.navegacao(1)}" icon="pi pi-home"
+                                         styleClass="ui-button-raised ui-button-secondary" />
+                    </p:toolbarGroup>
+                    <p:toolbarGroup align="center">
+                        <p:outputLabel style="color: #ffffff; font-size: 20px; font-weight: 600; padding-right: 123px" value="Controle FloraVida" />
+                    </p:toolbarGroup>
+                    <p:toolbarGroup align="right" style="gap: 10px">
+
+                    </p:toolbarGroup>
+                </p:toolbar>
+            </div>
+
+            <div style="display: flex; padding: 15px; background-color: #F8F9FA; border-radius: 16px; margin-top: 10px">
+                <p:dataTable widgetVar="pacienteTable" rowKey="#{paciente.id}" id="pacienteTable" value="#{interfacePaciente.pacientes}"
+                             var="paciente" scrollable="true" scrollHeight="420">
+
+                    <f:facet name="header">
+                        <div style="display: flex; justify-content: space-between; align-items: center" >
+                            <p:outputLabel value="Pacientes" />
+                            <div class="container" style="display: flex; gap: 5px">
+                                <p:commandButton class="item" style="border-radius: 50%" oncomplete="PF('cadastrar-Paciente-dialog').show()"
+                                                 icon="pi pi-plus-circle" styleClass="ui-button-raised ui-button-success" process="@this"
+                                                 update=":form:cadastrar-Paciente-dialog" actionListener="#{interfacePaciente.novoPaciente()}"
+                                                 action="#{interfacePaciente.setSalvareditar(true)}" immediate="true">
+                                    <p:ajax update=":form:cadastrar-Paciente-dialog" resetValues="true" />
+                                </p:commandButton>
+
+                                <p:commandButton class="item" style="border-radius: 160px" id="toggler" process="@this :form:msgs"
+                                                 update=":form:pacienteTable :form:msgs" type="button" icon="pi pi-align-justify"
+                                                 styleClass="ui-button-raised ui-button-secondary">
+                                    <p:columnToggler datasource="pacienteTable" id="colToggler" trigger="toggler">
+                                        <p:ajax process="@this :form:msgs" update=":form:pacienteTable :form:msgs" event="toggle" listener="#{filtroPaciente.onToggle}"/>
+                                    </p:columnToggler>
+                                </p:commandButton>
+
+                                <p:commandButton class="item" style="border-radius: 50%; color: white"
+                                                 styleClass="ui-button-raised ui-button-success"
+                                                 icon="pi pi-file-pdf" process="@this :form:pacienteTable"
+                                                 update=":form:msgs :form:pacienteTable @this"
+                                                 rendered="#{filtroPaciente.gerarPDFcolSelecionadas}"
+                                                 actionListener="#{filtroPaciente.gerarPDF()}" ajax="false">
+                                    <p:fileDownload value="#{filtroPaciente.file}"/>
+                                </p:commandButton>
+
+                                <p:commandButton class="item" style="border-radius: 50%; color: white"
+                                                 styleClass="ui-button-raised ui-button-success"
+                                                 icon="pi pi-file-pdf" process="@this :form:pacienteTable"
+                                                 update=":form:msgs :form:pacienteTable @this"
+                                                 rendered="#{!filtroPaciente.gerarPDFcolSelecionadas}"
+                                                 actionListener="#{filtroPaciente.gerarPDFSelecionado()}" ajax="false">
+                                    <p:fileDownload value="#{filtroPaciente.file}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </f:facet>
+
+                    <p:column field="nome" visible="true" headerText="Nome" width="25%">
+                        <h:outputText value="#{paciente.nome}" />
+                    </p:column>
+
+                    <p:column field="sus" visible="true" headerText="SUS" width="13%">
+                        <h:outputText value="#{paciente.sus}" />
+                    </p:column>
+
+                    <p:column field="area" visible="true" headerText="Area" width="10%">
+                        <h:outputText value="#{paciente.area}" />
+                    </p:column>
+
+                    <p:column sortBy="#{filtroGlobal.formatoCustomizado(paciente.idade)}"
+                              filterBy="#{filtroGlobal.formatoCustomizado(paciente.idade)}"
+                              filterMatchMode="contains"
+                              visible="true" headerText="Data Nasc" width="8%"
+                              style="font-size: 100%; text-align: center; vertical-align: middle;">
+                        <h:outputText value="#{paciente.idade}" >
+                            <f:convertDateTime pattern="#{filtroGlobal.dataPadrao()}"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column style="text-align: center; vertical-align: middle;"
+                              field="qtdmembros" visible="true" headerText="QMF" width="6%">
+                        <h:outputText value="#{paciente.qtdmembros}" />
+                    </p:column>
+
+                    <p:column field="sexo" visible="true" headerText="Sexo" width="6%"
+                              style="text-align: center; vertical-align: middle;">
+                        <h:outputText value="#{paciente.sexo}" />
+                    </p:column>
+
+                    <p:column field="patologia" visible="true" headerText="Patologia" width="10%">
+                        <h:outputText value="#{paciente.patologia}" />
+                    </p:column>
+
+                    <p:column field="telefone" visible="true" headerText="Telefone" width="10%">
+                        <h:outputText value="#{paciente.telefone}" />
+                    </p:column>
+
+                    <p:column exportable="false" toggleable="false" width="3%">
+                        <p:commandButton style="border-radius: 50%" id="editarPaciente"
+                                         actionListener="#{interfacePaciente.setPaciente(paciente)}"
+                                         action="#{interfacePaciente.setSalvareditar(false)}"
+                                         oncomplete="PF('cadastrar-Paciente-dialog').show()" styleClass="ui-button-raised ui-button-success"
+                                         update=":form:cadastrar-Paciente-dialog :form:msgs" icon="pi pi-user-edit" />
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+            <p:dialog id="deletePacienteDialog" style="border-radius: 25px" header="Excluir Paciente" showEffect="fade" modal="true"
+                      widgetVar="deletePacienteDialog" responsive="true" resizable="false">
+                <p:outputPanel id="delete-content" class="ui-fluid">
+                    <p:outputPanel>
+                        <div class="field">
+                            <p:outputLabel value="Deseja deletar esse paciente?" />
+                        </div>
+                    </p:outputPanel>
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <div style="display: flex; gap: 10px">
+                        <p:commandButton id="confirmaDelet" value="Deletar" process=":form:delete-content @this"
+                                         update=":form:msgs :form:pacienteTable" icon="pi pi-check"
+                                         styleClass="ui-button-raised ui-button-danger" 
+                                         actionListener="#{interfacePaciente.deletarPaciente()}"
+                                         oncomplete="PF('deletePacienteDialog').hide(); PF('cadastrar-Paciente-dialog').hide()"/>
+
+                        <p:commandButton style="size: 30px" id="cancelaDelet" value="Cancelar" process="@this"
+                                         update=":form:pacienteTable" icon="pi pi-times" styleClass="ui-button-raised ui-button-secondary"
+                                         oncomplete="PF('deletePacienteDialog').hide()"/>
+                    </div>
+                </f:facet>
+            </p:dialog>
+
+            <p:dialog id="cadastrar-Paciente-dialog" style="border-radius: 25px" header="Cadastrar Paciente" showEffect="fade" modal="true"
+                      widgetVar="cadastrar-Paciente-dialog" responsive="true" resizable="false">
+                <p:outputPanel id="Paciente-content" class="ui-fluid">
+                    <p:outputPanel style="width: 350px">
+                        <div class="field">
+                            <p:outputLabel value="Nome" />
+                            <p:inputText value="#{interfacePaciente.paciente.nome}"/>
+
+                            <p:outputLabel value="SUS"/>
+                            <p:inputMask value="#{interfacePaciente.paciente.sus}" mask="999.9999.9999.9999"/>
+
+                            <p:outputLabel value="Data de nascimento:" />
+                            <p:datePicker id="nascimento" pattern="dd/MM/yyyy" value="#{interfacePaciente.paciente.idade}" />
+
+                            <p:outputLabel value="Telefone" />
+                            <p:inputMask value="#{interfacePaciente.paciente.telefone}" mask="(99)9 9999-9999" />
+
+                            <p:outputLabel value="Quantidade de Membros:" />
+                            <p:selectOneMenu value="#{interfacePaciente.paciente.qtdmembros}" >
+                                <f:selectItem itemLabel="0-4" itemValue="0-4" />
+                                <f:selectItem itemLabel="4+" itemValue="4+" />
+                            </p:selectOneMenu>
+
+                            <p:outputLabel value="Patologia" />
+                            <p:inputText value="#{interfacePaciente.paciente.patologia}"/>
+
+                            <p:outputLabel value="Área:" />
+                            <p:selectOneMenu value="#{interfacePaciente.paciente.area}" >
+                                <f:selectItem itemLabel="Microarea 01" itemValue="Microarea 01" />
+                                <f:selectItem itemLabel="Microarea 02" itemValue="Microarea 02" />
+                                <f:selectItem itemLabel="Microarea 03" itemValue="Microarea 03" />
+                                <f:selectItem itemLabel="Microarea 04" itemValue="Microarea 04" />
+                                <f:selectItem itemLabel="Microarea 05" itemValue="Microarea 05" />
+                                <f:selectItem itemLabel="Microarea 06" itemValue="Microarea 06" />
+                                <f:selectItem itemLabel="Microarea 07" itemValue="Microarea 07" />
+                                <f:selectItem itemLabel="Microarea 08" itemValue="Microarea 08" />
+                                <f:selectItem itemLabel="Outro" itemValue="Outro" />
+                            </p:selectOneMenu>
+
+                            <p:outputLabel value="Sexo"/>
+                            <p:selectOneMenu value="#{interfacePaciente.paciente.sexo}" >
+                                <f:selectItem itemLabel="Homem" itemValue="Homem" />
+                                <f:selectItem itemLabel="Mulher" itemValue="Mulher" />
+                                <f:selectItem itemLabel="Outro" itemValue="Outro" />
+                            </p:selectOneMenu>
+                        </div>
+                    </p:outputPanel>
+                </p:outputPanel>
+                <f:facet id="facet" name="footer">
+                    <div id="campos" style="display: flex; gap: 10px">
+                        <p:commandButton value="Salvar" id="btSalvar"  style="color: white; size: 30px" icon="pi pi-plus-circle"
+                                         styleClass="ui-button-raised ui-button-success"
+                                         process="@this :form:pacienteTable :form:cadastrar-Paciente-dialog :form:Paciente-content"
+                                         update=":form:Paciente-content :form:msgs :form:pacienteTable"
+                                         actionListener="#{interfacePaciente.salvarPaciente()}"
+                                         rendered="#{interfacePaciente.salvareditar}" oncomplete="PF('cadastrar-Paciente-dialog').hide()"/>
+
+                        <p:commandButton value="Editar" id="btEditar"  style="color: white; size: 30px" icon="pi pi-check"
+                                         styleClass="ui-button-raised ui-button-success"
+                                         process="@this :form:cadastrar-Paciente-dialog :form:pacienteTable :form:Paciente-content"
+                                         update=":form:Paciente-content :form:msgs :form:pacienteTable"
+                                         actionListener="#{interfacePaciente.editarPaciente()}"
+                                         rendered="#{!interfacePaciente.salvareditar}" oncomplete="PF('cadastrar-Paciente-dialog').hide()"/>
+
+                        <p:commandButton value="Excluir" icon="pi pi-trash" styleClass="ui-button-raised ui-button-danger"
+                                         oncomplete="PF('deletePacienteDialog').show()" rendered="#{!interfacePaciente.salvareditar}">
+                        </p:commandButton>
+                        <p:commandButton value="Cancelar" style="color: white; size: 30px" icon="pi pi-times"
+                                         styleClass="ui-button-raised ui-button-secondary" process="@this"
+                                         oncomplete="PF('cadastrar-Paciente-dialog').hide()">
+                        </p:commandButton>
+                    </div>
+                </f:facet>
+            </p:dialog>
+
+            <p:dialog id="outra-area" style="border-radius: 25px" header="Informe a Área!" showEffect="fade" modal="true"
+                      widgetVar="outra-area" responsive="true" resizable="false">
+                <p:outputPanel id="area-content" class="ui-fluid">
+                    <p:outputPanel>
+                        <div class="field">
+                            <p:outputLabel value="Informe a área do paciente:" />
+                            <p:inputText value="#{interfacePaciente.paciente.area}"/>
+                        </div>
+                    </p:outputPanel>
+                </p:outputPanel>
+                <f:facet id="facet" name="footer">
+                    <div id="campos" style="display: flex; gap: 10px">
+                        <p:commandButton value="Salvar" id="btSalvarArea"  style="color: white; size: 30px" icon="pi pi-check"
+                                         styleClass="ui-button-raised ui-button-success" process="@this :form:pacienteTable :form:Paciente-content"
+                                         update=":form:msgs :form:pacienteTable" action="#{interfaceArea.salvarOutrasAreas(paciente.area)}"
+                                         actionListener="#{interfacePaciente.salvarPaciente()}"
+                                         rendered="#{interfacePaciente.salvareditar}"/>
+                    </div>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</html>
