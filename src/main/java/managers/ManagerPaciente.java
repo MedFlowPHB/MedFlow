@@ -5,7 +5,7 @@
 package managers;
 
 import java.io.Serializable;
-import javax.ejb.Stateless;
+import jakarta.ejb.Stateless;
 import modelo.Paciente;
 import servicos.ServicoPaciente;
 

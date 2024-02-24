@@ -5,10 +5,10 @@
 package interfaces;
 
 import java.io.Serializable;
-import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.faces.view.ViewScoped;
-import javax.inject.Named;
+import jakarta.annotation.PostConstruct;
+import jakarta.ejb.EJB;
+import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Named;
 import managers.ManagerUsuario;
 import modelo.Usuario;
 import servicos.ServicoUsuario;

@@ -1,7 +1,7 @@
 package servicos;
 
-import javax.ejb.Stateless;
-import javax.persistence.NoResultException;
+import jakarta.ejb.Stateless;
+import jakarta.persistence.NoResultException;
 import modelo.Microarea;
 
 @Stateless

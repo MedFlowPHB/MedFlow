@@ -5,8 +5,8 @@
 package servicos;
 
 import java.util.List;
-import javax.ejb.Stateless;
-import javax.persistence.NoResultException;
+import jakarta.ejb.Stateless;
+import jakarta.persistence.NoResultException;
 import modelo.Produto;
 import modelo.ProdutosDispensados;
 

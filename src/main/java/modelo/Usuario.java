@@ -2,7 +2,7 @@ package modelo;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license

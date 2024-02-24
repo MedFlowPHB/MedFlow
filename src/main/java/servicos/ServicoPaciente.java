@@ -4,10 +4,10 @@
  */
 package servicos;
 
-import javax.ejb.Stateless;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.persistence.NoResultException;
+import jakarta.ejb.Stateless;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
+import jakarta.persistence.NoResultException;
 import modelo.Paciente;
 
 /**

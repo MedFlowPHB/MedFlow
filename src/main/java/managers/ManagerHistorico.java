@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.ejb.Stateless;
+import jakarta.ejb.Stateless;
 import modelo.Paciente;
 import modelo.Produto;
 import modelo.Venda;

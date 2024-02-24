@@ -5,7 +5,7 @@
 package generico;
 
 import java.io.Serializable;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.MappedSuperclass;
 
 /**
  *
